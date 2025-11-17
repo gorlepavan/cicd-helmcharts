@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ecommerce-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ecommerce-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: srithar1234/ecommerce-backend1:v1
+    container_name: ecommerce-backend
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: root
+      DB_NAME: ecommerce
+    ports:
+      - "30083:8080"
+    depends_on:
+      - mysql
+    networks:
+      - ecommerce-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: srithar1234/ecommerce-frontend1:v1
+    container_name: ecommerce-frontend
+    ports:
+      - "30082:8080"
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+
+volumes:
+  mysql_data:
